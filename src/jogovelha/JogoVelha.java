@@ -74,22 +74,29 @@ public class JogoVelha {
             resp = in.nextInt();
         }
         sorteioUmJogador(vectM, nome, maquina, resp);
-        if (resp == 1) {
-            facil(vectM, nome, maquina);
-        } else {
-            dificil(vectM, nome, maquina);
-        }
     }
 
-    public static void facil(char[][] vectM, String jogador, String maquina) { //jogador x computador facil
+    public static void facil(char[][] vectM, String jogador, String maquina, boolean isJogadorComeca) { //jogador x computador facil
         Scanner in = new Scanner(System.in);
+        SecureRandom rand = new SecureRandom();
         int acabou = 0;
         int som = 0;
         int l, c;
+        int lMaquina;
+        int cMaquina;
+        imprimeMatriz(vectM);
         do {
-            imprimeMatriz(vectM);
-            if (som % 2 == 0) {
-                System.out.println(jogador + " é sua vez de jogar");
+            if (!isJogadorComeca) {
+                System.out.println(maquina + " é sua vez de jogar!");
+
+                do {
+                    lMaquina = rand.nextInt(3);
+                    cMaquina = rand.nextInt(3);
+                } while (isPosicaoPreenchida(lMaquina, cMaquina, vectM));
+                vectM[lMaquina][cMaquina] = preencheSimbolo(som);
+                isJogadorComeca = true;
+            } else {
+                System.out.println(jogador + " é sua vez de jogar!");
                 l = preencheLinha(in, vectM);
                 c = preencheColuna(in, vectM);
                 while (isPosicaoPreenchida(l, c, vectM)) {
@@ -98,14 +105,10 @@ public class JogoVelha {
                     l = preencheLinha(in, vectM);
                     c = preencheColuna(in, vectM);
                 }
-            } else {
-                System.out.println(maquina + " é sua vez de jogar");
-                
-                    l = preencheLinha(in, vectM);
-                    c = preencheColuna(in, vectM);
+                vectM[l][c] = preencheSimbolo(som);
+                isJogadorComeca = false;
             }
-
-            vectM[l][c] = preencheSimbolo(som);
+            imprimeMatriz(vectM);
             acabou = isAcabou(vectM, som);
             if (acabou == 1) {
                 quemGanhou(jogador, maquina, som);
@@ -115,10 +118,46 @@ public class JogoVelha {
                 break;
             }
             som++;
+            /*            imprimeMatriz(vectM);
+            if (isJogadorComeca) {
+                System.out.println(jogador + " é sua vez de jogar");
+                l = preencheLinha(in, vectM);
+                c = preencheColuna(in, vectM);
+                vectM[l][c] = preencheSimbolo(som);
+                while (isPosicaoPreenchida(l, c, vectM)) {
+                    System.out.println("Posição já preenchida");
+                    imprimeMatriz(vectM);
+                    l = preencheLinha(in, vectM);
+                    c = preencheColuna(in, vectM);
+                    vectM[l][c] = preencheSimbolo(som);
+                }
+                isJogadorComeca = false;
+            } else {
+                System.out.println(maquina + " é sua vez de jogar");
+                lMaquina = rand.nextInt(3);
+                cMaquina = rand.nextInt(3);
+                while (isPosicaoPreenchida(lMaquina, cMaquina, vectM)) {
+                    lMaquina = rand.nextInt(3);
+                    cMaquina = rand.nextInt(3);
+                    vectM[lMaquina][cMaquina] = preencheSimbolo(som);
+                }
+                vectM[lMaquina][cMaquina] = preencheSimbolo(som);
+                isJogadorComeca = true;
+            }
+            acabou = isAcabou(vectM, som);
+            if (acabou == 1) {
+                quemGanhou(jogador, maquina, som);
+                break;
+            } else if (acabou == -1) {
+                System.out.println("O jogo empatou!");
+                break;
+            }
+            som++;
+        } while (acabou == 0);*/
         } while (acabou == 0);
     }
 
-    public static void dificil(char[][] vectM, String nome, String maquina) { //jogador x computador dificil
+    public static void dificil(char[][] vectM, String nome, String maquina, boolean isJogadorComeca) { //jogador x computador dificil
 
     }
 
@@ -136,21 +175,21 @@ public class JogoVelha {
     public static void sorteioUmJogador(char[][] vectM, String nome, String maquina, int resp) {
         SecureRandom rand = new SecureRandom();
         System.out.println("Sorteando quem vai começar...");
-        int comeca = rand.nextInt(2);
+        boolean isJogadorComeca = rand.nextBoolean();
 
-        if (comeca == 1) {
+        if (isJogadorComeca) {
             System.out.println("Jogador " + nome + " vai começar!");
             if (resp == 1) {
-                facil(vectM, nome, maquina);
+                facil(vectM, nome, maquina, isJogadorComeca);
             } else {
-                dificil(vectM, nome, maquina);
+                dificil(vectM, nome, maquina, isJogadorComeca);
             }
         } else {
             System.out.println(maquina + " vai começar!");
             if (resp == 1) {
-                facil(vectM, maquina, nome);
+                facil(vectM, maquina, nome, isJogadorComeca);
             } else {
-                dificil(vectM, maquina, nome);
+                dificil(vectM, maquina, nome, isJogadorComeca);
             }
         }
     }
@@ -211,48 +250,66 @@ public class JogoVelha {
 
     public static boolean isCondicaoVitoriaDiagonalPrincipal(char[][] vectM, int som) { //checa diagonal principal
         char c = preencheSimbolo(som);
+        int ctd = 0;
         for (int i = 0; i < vectM.length; i++) {
-            if (vectM[i][i] != c) {
-                return false;
+            if (vectM[i][i] == c) {
+                ctd++;
             }
         }
-        return true;
+        if(ctd == 3){
+            return true;
+        }
+        return false;
     }
 
     public static boolean isCondicaoVitoriaDiagonalSecundaria(char[][] vectM, int som) {
         char c = preencheSimbolo(som);
         int l = 0;
+        int ctd = 0;
         for (int i = vectM.length - 1; i >= 0; i--) {//Diagonal secundaria
-            if (vectM[l][i] != c) {
-                return false;
+            if (vectM[l][i] == c) {
+                ctd++;
             }
             l++;
         }
-        return true;
+        if(ctd == 3){
+            return true;
+        }
+        return false;
     }
 
     public static boolean isCondicaoVitoriaLinha(char[][] vectM, int som) {
         char c = preencheSimbolo(som);
+        int ctd = 0;
         for (int i = 0; i < vectM.length; i++) {
             for (int j = 0; j < vectM[i].length; j++) {
-                if (vectM[i][j] != c) {
-                    return false;
+                if (vectM[i][j] == c) {
+                    ctd++;
                 }
             }
+            if(ctd == 3){
+                return true;
+            }
+            ctd = 0;
         }
-        return true;
+        return false;
     }
 
     public static boolean isCondicaoVitoriaColuna(char[][] vectM, int som) {
         char c = preencheSimbolo(som);
+        int ctd = 0;
         for (int i = 0; i < vectM.length; i++) {
             for (int j = 0; j < vectM[i].length; j++) {
-                if (vectM[j][i] != c) {
-                    return false;
+                if (vectM[j][i] == c) {
+                    ctd++;
                 }
             }
+            if(ctd == 3){
+                return true;
+            }
+            ctd = 0;
         }
-        return true;
+        return false;
     }
 
     public static boolean isEmpate(char[][] vectM) { //verifica se deu empate
@@ -288,7 +345,7 @@ public class JogoVelha {
         empate = isEmpate(vectM);
         if (dp || ds || linha || coluna) { //houve vencedor
             return 1;
-        } else if (empate == true) { //empatou
+        } else if (empate) { //empatou
             return -1;
         }
         return 0; //aconteceu nada
@@ -307,8 +364,9 @@ public class JogoVelha {
         int acabou = 0;
         int som = 0;
         int l, c;
+
+        imprimeMatriz(vectM);
         do {
-            imprimeMatriz(vectM);
             if (som % 2 == 0) {
                 System.out.println(jogUm + " é sua vez de jogar");
             } else {
@@ -331,6 +389,8 @@ public class JogoVelha {
                 System.out.println("O jogo empatou!");
                 break;
             }
+
+            imprimeMatriz(vectM);
             som++;
         } while (acabou == 0);
     }
