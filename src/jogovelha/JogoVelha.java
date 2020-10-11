@@ -118,42 +118,6 @@ public class JogoVelha {
                 break;
             }
             som++;
-            /*            imprimeMatriz(vectM);
-            if (isJogadorComeca) {
-                System.out.println(jogador + " é sua vez de jogar");
-                l = preencheLinha(in, vectM);
-                c = preencheColuna(in, vectM);
-                vectM[l][c] = preencheSimbolo(som);
-                while (isPosicaoPreenchida(l, c, vectM)) {
-                    System.out.println("Posição já preenchida");
-                    imprimeMatriz(vectM);
-                    l = preencheLinha(in, vectM);
-                    c = preencheColuna(in, vectM);
-                    vectM[l][c] = preencheSimbolo(som);
-                }
-                isJogadorComeca = false;
-            } else {
-                System.out.println(maquina + " é sua vez de jogar");
-                lMaquina = rand.nextInt(3);
-                cMaquina = rand.nextInt(3);
-                while (isPosicaoPreenchida(lMaquina, cMaquina, vectM)) {
-                    lMaquina = rand.nextInt(3);
-                    cMaquina = rand.nextInt(3);
-                    vectM[lMaquina][cMaquina] = preencheSimbolo(som);
-                }
-                vectM[lMaquina][cMaquina] = preencheSimbolo(som);
-                isJogadorComeca = true;
-            }
-            acabou = isAcabou(vectM, som);
-            if (acabou == 1) {
-                quemGanhou(jogador, maquina, som);
-                break;
-            } else if (acabou == -1) {
-                System.out.println("O jogo empatou!");
-                break;
-            }
-            som++;
-        } while (acabou == 0);*/
         } while (acabou == 0);
     }
 
