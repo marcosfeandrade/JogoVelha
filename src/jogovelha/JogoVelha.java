@@ -76,6 +76,44 @@ public class JogoVelha {
         sorteioUmJogador(vectM, nome, maquina, resp);
     }
 
+    public static boolean checarVitoriaMaquinaOuJogador(char[][] vectM, int som) {
+        boolean vitoriaMaquina = true;
+        boolean compPreencheLinha = computadorPreencheLinha(vectM, som, vitoriaMaquina);
+        if (compPreencheLinha) {
+            return true;
+        }
+        boolean compPreencheColuna = computadorPreencheColuna(vectM, som, vitoriaMaquina);
+        if (compPreencheColuna) {
+            return true;
+        }
+        boolean compPreencheDP = computadorPreencheDP(vectM, som, vitoriaMaquina);
+        if (compPreencheDP) {
+            return true;
+        }
+        boolean compPreencheDS = computadorPreencheDS(vectM, som, vitoriaMaquina);
+        if (compPreencheDS) {
+            return true;
+        }
+        vitoriaMaquina = false;
+        boolean compPreencheLinhaJ = computadorPreencheLinha(vectM, som, vitoriaMaquina);
+        if (compPreencheLinhaJ) {
+            return true;
+        }
+        boolean compPreencheColunaJ = computadorPreencheColuna(vectM, som, vitoriaMaquina);
+        if (compPreencheColunaJ) {
+            return true;
+        }
+        boolean compPreencheDPJ = computadorPreencheDP(vectM, som, vitoriaMaquina);
+        if (compPreencheDPJ) {
+            return true;
+        }
+        boolean compPreencheDSJ = computadorPreencheDS(vectM, som, vitoriaMaquina);
+        if (compPreencheDSJ) {
+            return true;
+        }
+        return false;
+    }
+
     public static void facil(char[][] vectM, String jogador, String maquina, boolean isJogadorComeca) { //jogador x computador facil
         Scanner in = new Scanner(System.in);
         SecureRandom rand = new SecureRandom();
@@ -121,8 +159,181 @@ public class JogoVelha {
         } while (acabou == 0);
     }
 
-    public static void dificil(char[][] vectM, String nome, String maquina, boolean isJogadorComeca) { //jogador x computador dificil
+    public static void dificil(char[][] vectM, String jogador, String maquina, boolean isJogadorComeca) { //jogador x computador dificil
+        Scanner in = new Scanner(System.in);
+        SecureRandom rand = new SecureRandom();
+        int acabou = 0;
+        int som = 0;
+        int l, c;
+        int lMaquina;
+        int cMaquina;
+        imprimeMatriz(vectM);
+        do {
+            if (!isJogadorComeca) { //maquina = 'X' && som % 2 = 0
+                System.out.println(maquina + " é sua vez de jogar!");
+                if (!checarVitoriaMaquinaOuJogador(vectM, som)) {
+                    do {
+                        lMaquina = rand.nextInt(3);
+                        cMaquina = rand.nextInt(3);
+                        System.out.println("sem condição bixo");
+                    } while (isPosicaoPreenchida(lMaquina, cMaquina, vectM));
+                    vectM[lMaquina][cMaquina] = preencheSimbolo(som);
+                }
+                isJogadorComeca = true;
+            } else {
+                System.out.println(jogador + " é sua vez de jogar!");
+                l = preencheLinha(in, vectM);
+                c = preencheColuna(in, vectM);
+                while (isPosicaoPreenchida(l, c, vectM)) {
+                    System.out.println("Posição já preenchida");
+                    imprimeMatriz(vectM);
+                    l = preencheLinha(in, vectM);
+                    c = preencheColuna(in, vectM);
+                }
+                vectM[l][c] = preencheSimbolo(som);
+                isJogadorComeca = false;
+            }
+            imprimeMatriz(vectM);
+            acabou = isAcabou(vectM, som);
+            if (acabou == 1) {
+                quemGanhou(jogador, maquina, som);
+                break;
+            } else if (acabou == -1) {
+                System.out.println("O jogo empatou!");
+                break;
+            }
+            som++;
+        } while (acabou == 0);
 
+    }
+
+    public static boolean computadorPreencheLinha(char[][] vectM, int som, boolean vitoriaMaquina) {
+        char s;
+        int vazioI = -1;
+        int vazioJ = -1;
+        int contSimbolo = 0;
+
+        for (int i = 0; i < vectM.length; i++) {
+
+            if (vitoriaMaquina) {
+                s = preencheSimbolo(som);
+            } else {
+                s = preencheSimbolo(som + 1);
+            }
+            for (int j = 0; j < vectM[i].length; j++) {
+
+                if (vectM[i][j] == s) {
+                    contSimbolo++;
+                }
+                if (!isPosicaoPreenchida(i, j, vectM)) {
+                    vazioI = i;
+                    vazioJ = j;
+                }
+            }
+            s = preencheSimbolo(som);
+            if (contSimbolo >= 2 && vazioI >= 0 && vazioJ >= 0) {
+                System.out.println("Condiçao linha");
+                vectM[vazioI][vazioJ] = s;
+                return true;
+            }
+            contSimbolo = 0;
+            vazioI = -1;
+            vazioJ = -1;
+        }
+        return false;
+    }
+
+    public static boolean computadorPreencheColuna(char[][] vectM, int som, boolean vitoriaMaquina) {
+        char s;
+
+        int vazioI = -1;
+        int vazioJ = -1;
+        int contSimbolo = 0;
+        for (int i = 0; i < vectM.length; i++) {
+            if (vitoriaMaquina) {
+                s = preencheSimbolo(som);
+            } else {
+                s = preencheSimbolo(som + 1);
+            }
+            for (int j = 0; j < vectM[i].length; j++) {
+                if (vectM[j][i] == s) {
+                    contSimbolo++;
+                }
+                if (!isPosicaoPreenchida(j, i, vectM)) {
+                    vazioI = i;
+                    vazioJ = j;
+                }
+            }
+            s = preencheSimbolo(som);
+            if (contSimbolo >= 2 && vazioI >= 0 && vazioJ >= 0) {
+                System.out.println("Condiçao coluna");
+
+                vectM[vazioJ][vazioI] = s;
+                return true;
+            }
+            contSimbolo = 0;
+            vazioI = -1;
+            vazioJ = -1;
+        }
+        return false;
+    }
+
+    public static boolean computadorPreencheDP(char[][] vectM, int som, boolean vitoriaMaquina) {
+        char s;
+        if (vitoriaMaquina) {
+            s = preencheSimbolo(som);
+        } else {
+            s = preencheSimbolo(som + 1);
+        }
+        int vazio = -1;
+        int contSimbolo = 0;
+        for (int i = 0; i < vectM.length; i++) {
+            if (vectM[i][i] == s) {
+                contSimbolo++;
+            }
+            if (!isPosicaoPreenchida(i, i, vectM)) {
+                vazio = i;
+
+            }
+        }
+        s = preencheSimbolo(som);
+        if (contSimbolo >= 2 && vazio >= 0) {
+            System.out.println("Condiçao dp");
+            vectM[vazio][vazio] = s;
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean computadorPreencheDS(char[][] vectM, int som, boolean vitoriaMaquina) {
+        char s;
+        if (vitoriaMaquina) {
+            s = preencheSimbolo(som);
+        } else {
+            s = preencheSimbolo(som + 1);
+        }
+        int l = 0;
+        int contSimbolo = 0;
+        int vazioI = -1;
+        int vazioL = -1;
+        for (int i = vectM.length - 1; i >= 0; i--) {
+            if (vectM[l][i] == s) {
+                contSimbolo++;
+            }
+            if (!isPosicaoPreenchida(l, i, vectM)) {
+                vazioI = i;
+                vazioL = l;
+            }
+            l++;
+        }
+        s = preencheSimbolo(som);
+        if (contSimbolo >= 2 && vazioI >= 0 && vazioL >= 0) {
+            System.out.println("Condiçao ds");
+
+            vectM[vazioL][vazioI] = s;
+            return true;
+        }
+        return false;
     }
 
     public static void doisJ(char[][] vectM) { //dois jogadores
@@ -151,9 +362,9 @@ public class JogoVelha {
         } else {
             System.out.println(maquina + " vai começar!");
             if (resp == 1) {
-                facil(vectM, maquina, nome, isJogadorComeca);
+                facil(vectM, nome, maquina, isJogadorComeca);
             } else {
-                dificil(vectM, maquina, nome, isJogadorComeca);
+                dificil(vectM, nome, maquina, isJogadorComeca);
             }
         }
     }
@@ -220,7 +431,7 @@ public class JogoVelha {
                 ctd++;
             }
         }
-        if(ctd == 3){
+        if (ctd == 3) {
             return true;
         }
         return false;
@@ -236,7 +447,7 @@ public class JogoVelha {
             }
             l++;
         }
-        if(ctd == 3){
+        if (ctd == 3) {
             return true;
         }
         return false;
@@ -251,7 +462,7 @@ public class JogoVelha {
                     ctd++;
                 }
             }
-            if(ctd == 3){
+            if (ctd == 3) {
                 return true;
             }
             ctd = 0;
@@ -268,7 +479,7 @@ public class JogoVelha {
                     ctd++;
                 }
             }
-            if(ctd == 3){
+            if (ctd == 3) {
                 return true;
             }
             ctd = 0;
